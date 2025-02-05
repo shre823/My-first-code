@@ -1,0 +1,166 @@
+import json
+from collections import defaultdict
+
+
+# --- Step 1: User Input and Data Management ---
+
+def get_expense():
+    """
+    Prompt the user to input an expense including amount, description, and category.
+    
+    Returns:
+        dict: A dictionary containing the expense details (amount, description, category).
+    """
+    try:
+        # Taking user inputs for expense details
+        amount = float(input("Enter the expense amount: $"))
+        description = input("Enter a description for the expense: ")
+        category = input("Enter the expense category (e.g., food, transportation, entertainment): ")
+        
+        # Return the expense as a dictionary
+        expense = {
+            'amount': amount,
+            'description': description,
+            'category': category
+        }
+        return expense
+    except ValueError:
+        print("Invalid input. Please enter a valid amount.")
+        return None
+
+
+# --- Step 2: Data Storage ---
+
+def save_expenses_to_file(expenses, filename="expenses.json"):
+    """
+    Save the list of expenses to a JSON file.
+    
+    Args:
+        expenses (list): List of expenses to save.
+        filename (str): The filename where the data will be stored.
+    """
+    with open(filename, 'w') as file:
+        json.dump(expenses, file)
+
+
+def load_expenses_from_file(filename="expenses.json"):
+    """
+    Load the expenses from a JSON file.
+    
+    Args:
+        filename (str): The file name to load expenses from.
+        
+    Returns:
+        list: List of expenses retrieved from the file.
+    """
+    try:
+        with open(filename, 'r') as file:
+            return json.load(file)
+    except FileNotFoundError:
+        return []  # Return an empty list if the file doesn't exist.
+
+
+# --- Step 3: Expense Categories ---
+
+def show_categories():
+    """
+    Show predefined expense categories.
+    """
+    categories = ['Food', 'Transportation', 'Entertainment', 'Utilities', 'Others']
+    print("Available Categories:")
+    for category in categories:
+        print(f"- {category}")
+
+
+# --- Step 4: Data Analysis ---
+
+def monthly_summary(expenses):
+    """
+    Generate a monthly summary of the total expenses.
+    
+    Args:
+        expenses (list): The list of expense records.
+    """
+    total_expenses = sum(expense['amount'] for expense in expenses)
+    print(f"\nTotal Expenses: ${total_expenses:.2f}")
+
+
+def category_summary(expenses):
+    """
+    Generate a category-wise summary of expenses.
+    
+    Args:
+        expenses (list): The list of expense records.
+    """
+    category_totals = defaultdict(float)
+    
+    for expense in expenses:
+        category_totals[expense['category']] += expense['amount']
+    
+    print("\nCategory-wise Expenses:")
+    for category, total in category_totals.items():
+        print(f"{category}: ${total:.2f}")
+
+
+# --- Step 5: User Interface ---
+
+def show_menu():
+    """
+    Display the main menu of the Expense Tracker application.
+    """
+    print("\n--- Expense Tracker ---")
+    print("1. Add an expense")
+    print("2. View monthly summary")
+    print("3. View category summary")
+    print("4. Exit")
+
+
+def main():
+    """
+    Main function to run the Expense Tracker program.
+    It manages user interaction and handles the functionality.
+    """
+    # Load existing expenses from file if any
+    expenses = load_expenses_from_file()
+    
+    while True:
+        show_menu()
+        choice = input("Enter your choice (1/2/3/4): ")
+
+        if choice == '1':
+            # Add an expense
+            expense = get_expense()
+            if expense:
+                expenses.append(expense)
+                save_expenses_to_file(expenses)  # Save to file after adding
+                print("Expense added successfully!\n")
+        
+        elif choice == '2':
+            # View the monthly summary
+            monthly_summary(expenses)
+        
+        elif choice == '3':
+            # View category-wise summary
+            category_summary(expenses)
+        
+        elif choice == '4':
+            # Exit the program
+            print("Exiting Expense Tracker. Goodbye!")
+            break
+        
+        else:
+            print("Invalid choice. Please try again.")
+
+
+# --- Step 6: Error Handling ---
+
+# Example: The `get_expense()` function already handles invalid user input gracefully.
+# Additional error handling can be implemented for different user actions.
+
+
+# --- Step 7: Documentation ---
+
+# The code above includes extensive comments explaining the purpose of each function and step in the project.
+
+if __name__ == "__main__":
+    main()
